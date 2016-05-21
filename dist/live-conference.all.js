@@ -1569,6 +1569,31 @@ angular.module('op.live-conference')
         });
       }
 
+      function getAllAttendants(){
+        var occupants = easyrtc.getRoomOccupantsAsArray(room);
+
+        if (!occupants) {
+          return [];
+        }
+        return occupants.filter(function(id){
+          return id !== myEasyrtcid();
+        });
+
+      }
+      function blobAcceptor(otherGuy, blob, filename) {
+        easyrtc_ft.saveAs(blob, filename);
+      }
+      function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
+          console.log("", otherGuy, fileNameList)
+          wasAccepted(true)
+      }
+
+      function receiveStatusCB(otherGuy, status){
+        console.log(otherGuy, status)
+      }
+
+      easyrtc_ft.buildFileReceiver(acceptRejectCB, blobAcceptor, receiveStatusCB);
+
       function broadcastMe() {
         var attendee = currentConferenceState.getAttendeeByEasyrtcid(myEasyrtcid());
 
@@ -1658,6 +1683,7 @@ angular.module('op.live-conference')
         setPeerListener: setPeerListener,
         myEasyrtcid: myEasyrtcid,
         broadcastData: broadcastData,
+        getAllAttendants: getAllAttendants,
         broadcastMe: broadcastMe,
         addDisconnectCallback: addDisconnectCallback,
         removeDisconnectCallback: removeDisconnectCallback,
