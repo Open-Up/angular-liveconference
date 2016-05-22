@@ -468,18 +468,29 @@ angular.module('op.live-conference')
     };
   }])
   .directive('dropZone', ['easyRTCService', function (easyRTCService) {
-    function link(scope, element) {
+    function link(scope, element, attrs) {
       easyrtc_ft.buildDragNDropRegion(element[0], function (files) {
         function updateStatusDiv(state) {
           console.log("TEST SEND FILE", state);
           return true;
         }
-        easyRTCService.getAllAttendants().forEach(function(id) {
-          var fileSender = easyrtc_ft.buildFileSender(id, updateStatusDiv);
-          var assumeBinary = true;
+        var fileSender;
+        var assumeBinary = true;
+
+        if (attrs.dropZoneAttendeeId) {
+          if (attrs.dropZoneAttendeeId === easyRTCService.myEasyrtcid()) {
+            return;
+          }
+          fileSender = easyrtc_ft.buildFileSender(attrs.dropZoneAttendeeId, updateStatusDiv);
           fileSender(files, assumeBinary);
-        });
-      })
+        } else {
+          easyRTCService.getAllAttendants().forEach(function (id) {
+            fileSender = easyrtc_ft.buildFileSender(id, updateStatusDiv);
+            fileSender(files, assumeBinary);
+          });
+        }
+
+      });
     }
     return {
       restrict: 'A',
