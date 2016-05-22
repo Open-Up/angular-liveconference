@@ -789,6 +789,25 @@ angular.module('op.live-conference')
       }
     };
   }])
+  .directive('dropZone', ['easyRTCService', function (easyRTCService) {
+    function link(scope, element) {
+      easyrtc_ft.buildDragNDropRegion(element[0], function (files) {
+        function updateStatusDiv(state) {
+          console.log("TEST SEND FILE", state);
+          return true;
+        }
+        easyRTCService.getAllAttendants().forEach(function(id) {
+          var fileSender = easyrtc_ft.buildFileSender(id, updateStatusDiv);
+          var assumeBinary = true;
+          fileSender(files, assumeBinary);
+        });
+      })
+    }
+    return {
+      restrict: 'A',
+      link: link
+    };
+  }])
   .directive('userTime', ['attendeeColorsService', '$interval', 'currentConferenceState', 'LOCAL_VIDEO_ID', 'moment', function(attendeeColorsService, $interval, currentConferenceState, LOCAL_VIDEO_ID, moment) {
     function link(scope, element) {
       function formatRemoteTime() {
@@ -1844,5 +1863,5 @@ angular.module('op.liveconference-templates', []).run(['$templateCache', functio
   $templateCache.put("templates/user-control-bar.jade",
     "<div class=\"conference-user-control-bar text-center\"><ul dynamic-directive=\"live-conference-control-bar-items\" class=\"list-inline\"><li><a href=\"\" ng-click=\"toggleSound()\"><i ng-class=\"{'fa-microphone': !muted, 'fa-microphone-slash': muted}\" class=\"fa fa-2x conference-mute-button conference-light-button\"></i></a></li><li ng-class=\"{'hidden': noVideo}\"><a href=\"\" ng-click=\"toggleCamera()\"><i ng-class=\"{'fa-eye': !videoMuted, 'fa-eye-slash': videoMuted}\" class=\"fa fa-2x conference-toggle-video-button conference-light-button\"></i></a></li><li><a href=\"\" ng-click=\"leaveConference()\"><i class=\"fa fa-phone fa-2x conference-toggle-terminate-call-button conference-light-button\"></i></a></li><li><a href=\"\" ng-click=\"showInvitationPanel()\"><i class=\"fa fa-users fa-2x conference-toggle-invite-button conference-light-button\"></i></a></li><editor-toggle-element></editor-toggle-element></ul></div>");
   $templateCache.put("templates/user-video.jade",
-    "<div class=\"user-video\"><div smart-fit from=\"#multiparty-conference\" class=\"canvas-container\"><canvas id=\"mainVideoCanvas\" ng-click=\"onMobileToggleControls()\" class=\"conference-main-video-multi\"></canvas><div user-time ng-show=\"remoteHour\" ng-style=\"{'color' : color}\" class=\"user-time\">{{remoteHour}}</div></div></div>");
+    "<div drop-zone class=\"user-video\"><div smart-fit from=\"#multiparty-conference\" class=\"canvas-container\"><canvas id=\"mainVideoCanvas\" ng-click=\"onMobileToggleControls()\" class=\"conference-main-video-multi\"></canvas><div user-time ng-show=\"remoteHour\" ng-style=\"{'color' : color}\" class=\"user-time\">{{remoteHour}}</div></div></div>");
 }]);

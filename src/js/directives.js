@@ -467,6 +467,25 @@ angular.module('op.live-conference')
       }
     };
   }])
+  .directive('dropZone', ['easyRTCService', function (easyRTCService) {
+    function link(scope, element) {
+      easyrtc_ft.buildDragNDropRegion(element[0], function (files) {
+        function updateStatusDiv(state) {
+          console.log("TEST SEND FILE", state);
+          return true;
+        }
+        easyRTCService.getAllAttendants().forEach(function(id) {
+          var fileSender = easyrtc_ft.buildFileSender(id, updateStatusDiv);
+          var assumeBinary = true;
+          fileSender(files, assumeBinary);
+        });
+      })
+    }
+    return {
+      restrict: 'A',
+      link: link
+    };
+  }])
   .directive('userTime', ['attendeeColorsService', '$interval', 'currentConferenceState', 'LOCAL_VIDEO_ID', 'moment', function(attendeeColorsService, $interval, currentConferenceState, LOCAL_VIDEO_ID, moment) {
     function link(scope, element) {
       function formatRemoteTime() {
