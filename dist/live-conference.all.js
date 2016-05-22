@@ -1603,7 +1603,6 @@ angular.module('op.live-conference')
         easyrtc_ft.saveAs(blob, filename);
       }
       function acceptRejectCB(otherGuy, fileNameList, wasAccepted) {
-        wasAccepted(true);
         $rootScope.$broadcast("downloadInvitation",
           otherGuy,
           fileNameList.map(function(object) {
